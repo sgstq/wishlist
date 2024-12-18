@@ -96,6 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Close modal
     closeButton?.addEventListener('click', () => {
         previewModal.style.display = 'none';
+        // Clean up any price input
+        const existingInput = previewModal.querySelector('input[type="number"]');
+        if (existingInput) {
+            existingInput.remove();
+        }
     });
 
     // Close modal when clicking outside
@@ -120,23 +125,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Move the existing button click handlers to separate functions
     function handleAddGift() {
         const files = Array.from(giftImageInput.files);
-        const price = giftPriceInput.value;
+        const priceValue = giftPriceInput.value;
+        const parsedPrice = priceValue ? validateAndParsePrice(priceValue) : null;
 
         if (files.length === 0) {
             giftImageInput.classList.add('error');
             return;
         }
         
+        // If price is provided but invalid, show error
+        if (priceValue && parsedPrice === null) {
+            giftPriceInput.classList.add('error');
+            return;
+        }
+        
         giftImageInput.classList.remove('error');
+        giftPriceInput.classList.remove('error');
+        
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                if (price) {
-                    const priceInCents = Math.round(parseFloat(price) * 100);
-                    addGift(e.target.result, priceInCents);
-                } else {
-                    addGift(e.target.result);
-                }
+                addGift(e.target.result, parsedPrice);
             };
             reader.readAsDataURL(file);
         });
@@ -149,13 +158,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleSetLimit() {
         const limitValue = priceLimitInput.value;
-        if (!limitValue) {
+        const parsedLimit = validateAndParsePrice(limitValue);
+        
+        if (parsedLimit === null) {
             priceLimitInput.classList.add('error');
             return;
         }
         
         priceLimitInput.classList.remove('error');
-        priceLimit = Math.round(parseFloat(limitValue) * 100) || 0;
+        priceLimit = parsedLimit;
         updateBinStatus();
         
         limitSection.style.display = 'none';
@@ -184,7 +195,7 @@ function formatPrice(cents) {
 function createGiftCard(gift) {
     const card = document.createElement('div');
     card.className = 'gift-card';
-    card.draggable = true;
+    card.draggable = gift.price !== null;
     card.dataset.id = gift.id;
 
     if (gift.price === null) {
@@ -193,13 +204,65 @@ function createGiftCard(gift) {
 
     card.innerHTML = `
         <img src="${gift.image}" alt="Gift">
-        <div class="price">${gift.price !== null ? formatPrice(gift.price) : 'Price not set'}</div>
+        <div class="price" ${gift.price !== null ? 'data-editable="true"' : ''}>
+            ${gift.price !== null ? formatPrice(gift.price) : 'Price not set'}
+        </div>
         ${gift.price === null ? '<button class="set-price-button">Set Price</button>' : ''}
-        <button class="remove-button">&times;</button>
+        <button class="remove-button"></button>
     `;
 
     // Add click handler for image preview
     card.querySelector('img').addEventListener('click', () => showPreview(gift));
+
+    // Add price click handler for editing
+    const priceDiv = card.querySelector('.price[data-editable="true"]');
+    if (priceDiv) {
+        priceDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            // Check if we're already editing
+            if (card.querySelector('form')) return;
+            
+            const form = document.createElement('form');
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = '0.01';
+            input.min = '0';
+            input.value = (gift.price / 100).toFixed(2);
+            input.className = 'price-input';
+            
+            form.appendChild(input);
+            priceDiv.style.display = 'none';
+            priceDiv.after(form);
+            input.focus();
+            
+            const updatePrice = () => {
+                const parsedPrice = validateAndParsePrice(input.value);
+                if (parsedPrice === null) {
+                    input.classList.add('error');
+                    return false;
+                }
+                gift.price = parsedPrice;
+                priceDiv.textContent = formatPrice(gift.price);
+                priceDiv.style.display = 'block';
+                form.remove();
+                updateBinStatus();
+                return true;
+            };
+            
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                updatePrice();
+            };
+            
+            input.onblur = () => {
+                if (!updatePrice()) {
+                    // If price update failed, restore original display
+                    priceDiv.style.display = 'block';
+                    form.remove();
+                }
+            };
+        });
+    }
 
     // Add set price button handler
     const setPriceButton = card.querySelector('.set-price-button');
@@ -256,21 +319,38 @@ function showPreview(gift, setPriceMode = false) {
     previewImage.src = gift.image;
     previewModal.style.display = 'block';
     
+    // Clean up any existing forms first
+    const existingForms = previewModal.querySelectorAll('form');
+    existingForms.forEach(form => form.remove());
+    
     if (setPriceMode || gift.price === null) {
-        addToBinButton.textContent = 'Set Price';
+        addToBinButton.style.display = 'none';
+        
+        const priceForm = document.createElement('form');
         const priceInput = document.createElement('input');
         priceInput.type = 'number';
         priceInput.step = '0.01';
+        priceInput.min = '0';
         priceInput.placeholder = 'Enter price (€)';
+        priceInput.className = 'price-input';
         
-        addToBinButton.onclick = () => {
-            const price = priceInput.value;
-            if (!price) {
+        priceForm.appendChild(priceInput);
+        const modalContent = previewModal.querySelector('.modal-content');
+        modalContent.insertBefore(priceForm, addToBinButton);
+        
+        priceInput.focus();
+        
+        priceForm.onsubmit = (e) => {
+            e.preventDefault();
+            const parsedPrice = validateAndParsePrice(priceInput.value);
+            
+            if (parsedPrice === null) {
                 priceInput.classList.add('error');
                 return;
             }
+            
             priceInput.classList.remove('error');
-            gift.price = Math.round(parseFloat(price) * 100);
+            gift.price = parsedPrice;
             const card = giftList.querySelector(`[data-id="${gift.id}"]`);
             if (card) {
                 card.replaceWith(createGiftCard(gift));
@@ -278,6 +358,9 @@ function showPreview(gift, setPriceMode = false) {
             previewModal.style.display = 'none';
         };
     } else {
+        // Show the Add to Bin button for normal preview
+        addToBinButton.style.display = 'block';
+        
         // Change button text and action based on gift location
         if (gift.location === 'bin') {
             addToBinButton.textContent = 'Remove from Bin';
@@ -297,8 +380,16 @@ function showPreview(gift, setPriceMode = false) {
 
 // Placeholder for drag and drop functions (will be implemented next)
 function handleDragStart(e) {
-    const card = e.target.closest('.gift-card'); // Make sure we get the card element
-    if (!card) return;
+    const card = e.target.closest('.gift-card');
+    if (!card || !card.draggable) return;
+    
+    const giftId = parseInt(card.dataset.id);
+    const gift = gifts.find(g => g.id === giftId);
+    
+    if (!gift || gift.price === null) {
+        e.preventDefault();
+        return;
+    }
     
     e.dataTransfer.setData('text/plain', card.dataset.id);
     e.dataTransfer.effectAllowed = 'move';
@@ -365,7 +456,8 @@ function updateBinStatus() {
         limitLeftSpan.textContent = 'No limit set';
     } else {
         const limitLeft = priceLimit - totalPrice;
-        limitLeftSpan.textContent = formatPrice(limitLeft);
+        const emoji = limitLeft >= 0 ? ' 😊' : ' 😢';
+        limitLeftSpan.textContent = formatPrice(limitLeft) + emoji;
         
         if (totalPrice > priceLimit) {
             giftBin.classList.remove('under-limit');
@@ -441,3 +533,19 @@ giftList.addEventListener('drop', (e) => {
         console.error('Drop error:', error);
     }
 });
+
+// Add this helper function near the top with other utility functions
+function validateAndParsePrice(value) {
+    // Remove any whitespace
+    const trimmed = String(value).trim();
+    if (trimmed === '') return null;
+    
+    // Parse the value
+    const parsed = parseFloat(trimmed);
+    
+    // Check if it's a valid non-negative number
+    if (isNaN(parsed) || parsed < 0) return null;
+    
+    // Convert to cents and round to avoid floating point issues
+    return Math.round(parsed * 100);
+}

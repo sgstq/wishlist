@@ -56,6 +56,7 @@ h2 {
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: move;
+    padding-top: 36px;
 }
 
 .gift-card:hover {
@@ -67,6 +68,7 @@ h2 {
     width: 100%;
     height: 160px;
     object-fit: cover;
+    margin-top: -36px;
 }
 
 .gift-card .price {
@@ -80,21 +82,41 @@ h2 {
     border: 2px solid var(--danger-color);
 }
 
-.gift-card .remove-button {
+.remove-button, .close-button {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.7);
     color: white;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.2s;
+    line-height: 0;
+    padding-bottom: 4px;
+}
+
+.remove-button:hover, .close-button:hover {
+    background: var(--danger-color);
+    transform: scale(1.1);
+}
+
+.gift-card .remove-button {
+    top: 8px;
+    right: 8px;
+}
+
+.close-button {
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
 }
 
 .set-price-button {
@@ -193,16 +215,17 @@ input[type="file"] {
 .modal-content {
     position: relative;
     background: white;
-    margin: 40px auto;
-    padding: 24px;
-    max-width: 500px;
+    margin: 20px auto;
+    padding: 32px;
+    width: 90%;
+    max-width: 1200px;
     border-radius: 12px;
     text-align: center;
 }
 
 .modal-content img {
     max-width: 100%;
-    max-height: 400px;
+    max-height: 80vh;
     object-fit: contain;
     margin-bottom: 20px;
 }
@@ -218,13 +241,27 @@ input[type="file"] {
 
 .close-button {
     position: absolute;
-    top: 12px;
-    right: 12px;
-    background: none;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.7);
     border: none;
+    border-radius: 50%;
     font-size: 24px;
     cursor: pointer;
-    color: var(--gray);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 0;
+    padding-bottom: 4px;
+}
+
+.close-button:hover {
+    background: var(--danger-color);
+    transform: scale(1.1);
 }
 
 .drag-over {
@@ -369,5 +406,85 @@ input[type="number"].error {
 
 .error + .error-message {
     display: block;
+}
+
+/* Style for price input in modal */
+.modal-content .price-input {
+    padding: 8px 12px;
+    border: 2px solid var(--gray);
+    border-radius: 20px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    width: 150px;
+    margin: 10px 0;
+}
+
+.modal-content .price-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.modal-content .price-input.error {
+    border-color: var(--danger-color);
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+.price[data-editable="true"] {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.price[data-editable="true"]:hover {
+    background-color: var(--gray-light);
+    border-radius: 4px;
+}
+
+.gift-card form {
+    padding: 12px;
+    text-align: center;
+}
+
+.gift-card .price-input {
+    width: 80px;
+    text-align: center;
+    padding: 4px 8px;
+    border: 1px solid var(--gray);
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.gift-card .price-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Update modal button styles */
+.modal-content button#addToBin {
+    padding: 12px 24px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 80%;
+    margin: 20px auto;
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.modal-content button#addToBin:hover {
+    background: var(--primary-color);
+    filter: brightness(1.1);
+}
+
+.remove-button::before, .close-button::before {
+    content: "×";
+    display: block;
+}
+
+/* Add this style to increase the emoji size */
+.limit-left::before {
+    font-size: 24px; /* Adjust the size as needed */
 }
   
