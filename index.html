@@ -9,17 +9,19 @@
 <body>
     <div class="container">
         <div class="gift-list-panel">
-            <h2>Gift List</h2>
+            <div class="list-header">
+                <h2>Gift List</h2>
+            </div>
             <div class="gift-list" id="giftList">
                 <!-- Gift cards will be added here -->
             </div>
             <button id="showUploadSection" class="toggle-button">Add Gifts</button>
             <div class="upload-options" style="display: none;">
-                <div class="upload-section">
+                <form class="upload-section" id="uploadForm">
                     <input type="file" id="giftImage" accept="image/*" multiple>
                     <input type="number" id="giftPrice" placeholder="Price (€)" step="0.01">
-                    <button id="addGift" class="primary-button">Add Gift(s)</button>
-                </div>
+                    <button type="submit" id="addGift" class="primary-button">Add Gift(s)</button>
+                </form>
             </div>
         </div>
 
@@ -36,8 +38,10 @@
             </div>
             <button id="showLimitSection" class="toggle-button">Set Price Limit</button>
             <div class="price-limit-section" style="display: none;">
-                <input type="number" id="priceLimit" placeholder="Price Limit (€)" step="0.01">
-                <button id="setLimit">Set Limit</button>
+                <form id="limitForm" class="limit-form">
+                    <input type="number" id="priceLimit" placeholder="Price Limit (€)" step="0.01">
+                    <button type="submit" id="setLimit">Set Limit</button>
+                </form>
             </div>
         </div>
     </div>

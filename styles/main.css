@@ -19,7 +19,7 @@
     gap: 30px;
     padding: 30px;
     min-height: 100vh;
-    background-color: var(--gray-light);
+    background-color: white;
 }
 
 .gift-list-panel, .bin-panel {
@@ -27,6 +27,7 @@
     padding: 24px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
 }
 
 h2 {
@@ -108,45 +109,61 @@ h2 {
 }
 
 .bin-status {
+    text-align: right;
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-    margin-bottom: 20px;
+    gap: 20px;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 0;
 }
 
 .total-price, .limit-left {
     font-size: 18px;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .toggle-button {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
     margin-top: 20px;
-    background: var(--primary-color);
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--gray);
+    border: 1px dashed var(--gray);
     border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
+    font-weight: normal;
+    font-size: 14px;
+    transition: all 0.2s;
 }
 
 .toggle-button:hover {
-    filter: brightness(1.1);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: var(--gray-light);
+    filter: none;
+}
+
+.toggle-button::before {
+    content: '+ ';
+    font-size: 16px;
 }
 
 .upload-options {
     margin-top: 20px;
     padding: 20px;
-    background: var(--gray-light);
-    border-radius: 8px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .upload-section {
-    display: grid;
+    display: flex;
     gap: 12px;
+    align-items: center;
+    padding: 16px;
+    width: 100%;
 }
 
 input[type="file"],
@@ -159,6 +176,7 @@ input[type="number"] {
 
 input[type="file"] {
     border-style: dashed;
+    max-width: 300px;
 }
 
 .preview-modal {
@@ -220,5 +238,136 @@ input[type="file"] {
 
 .bin.over-limit {
     border-color: var(--danger-color);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.panel-header h2 {
+    margin-bottom: 0;
+}
+
+.bin-status {
+    text-align: right;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.list-header h2 {
+    margin-bottom: 0;
+}
+
+/* Update styles for action buttons */
+.primary-button, #setLimit {
+    padding: 8px 16px;
+    background: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 100px;
+}
+
+.primary-button:hover, #setLimit:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(33,150,243,0.2);
+}
+
+/* Style for file input button */
+input[type="file"]::file-selector-button {
+    padding: 8px 16px;
+    background: white;
+    color: var(--gray);
+    border: 2px solid var(--gray);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+    margin-right: 10px;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: var(--gray);
+    color: white;
+}
+
+/* Update input styles to match */
+input[type="number"] {
+    padding: 8px 12px;
+    border: 2px solid var(--gray);
+    border-radius: 20px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    width: auto;
+    min-width: 120px;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Update price limit section layout */
+.price-limit-section {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Update input field to not stretch */
+.price-limit-section input[type="number"] {
+    width: 150px;  /* Fixed width */
+    margin-right: 8px;  /* Small space between input and button */
+}
+
+/* Remove the auto margins since we don't need them */
+#setLimit {
+    margin-left: 0;
+}
+
+/* Add styles for the forms */
+.limit-form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Add validation styles for inputs */
+input[type="number"].error {
+    border-color: var(--danger-color);
+    background-color: rgba(244, 67, 54, 0.05);
+}
+
+/* Add error message style */
+.error-message {
+    color: var(--danger-color);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.error + .error-message {
+    display: block;
 }
   

@@ -50,9 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setLimitButton?.addEventListener('click', () => {
         const limitValue = priceLimitInput.value;
         if (!limitValue) {
-            alert('Please enter a price limit');
+            priceLimitInput.classList.add('error');
             return;
         }
+        
+        priceLimitInput.classList.remove('error');
         priceLimit = Math.round(parseFloat(limitValue) * 100) || 0;
         updateBinStatus();
         
@@ -67,10 +69,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const price = giftPriceInput.value;
 
         if (files.length === 0) {
-            alert('Please select at least one image');
+            giftImageInput.classList.add('error');
             return;
         }
-
+        
+        giftImageInput.classList.remove('error');
         files.forEach(file => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -100,6 +103,75 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === previewModal) {
             previewModal.style.display = 'none';
         }
+    });
+
+    // Upload form submit
+    document.getElementById('uploadForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleAddGift();
+    });
+
+    // Price limit form submit
+    document.getElementById('limitForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleSetLimit();
+    });
+
+    // Move the existing button click handlers to separate functions
+    function handleAddGift() {
+        const files = Array.from(giftImageInput.files);
+        const price = giftPriceInput.value;
+
+        if (files.length === 0) {
+            giftImageInput.classList.add('error');
+            return;
+        }
+        
+        giftImageInput.classList.remove('error');
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (price) {
+                    const priceInCents = Math.round(parseFloat(price) * 100);
+                    addGift(e.target.result, priceInCents);
+                } else {
+                    addGift(e.target.result);
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        giftImageInput.value = '';
+        giftPriceInput.value = '';
+        uploadOptions.style.display = 'none';
+        showUploadButton.textContent = 'Add Gifts';
+    }
+
+    function handleSetLimit() {
+        const limitValue = priceLimitInput.value;
+        if (!limitValue) {
+            priceLimitInput.classList.add('error');
+            return;
+        }
+        
+        priceLimitInput.classList.remove('error');
+        priceLimit = Math.round(parseFloat(limitValue) * 100) || 0;
+        updateBinStatus();
+        
+        limitSection.style.display = 'none';
+        showLimitButton.textContent = 'Set Price Limit';
+        priceLimitInput.value = '';
+    }
+
+    // Update existing button click handlers to use the new functions
+    addGiftButton?.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent form submit since we're handling it
+        handleAddGift();
+    });
+
+    setLimitButton?.addEventListener('click', (e) => {
+        e.preventDefault(); // Prevent form submit since we're handling it
+        handleSetLimit();
     });
 });
 
@@ -190,17 +262,14 @@ function showPreview(gift, setPriceMode = false) {
         priceInput.type = 'number';
         priceInput.step = '0.01';
         priceInput.placeholder = 'Enter price (€)';
-        previewModal.querySelector('.modal-content').insertBefore(
-            priceInput,
-            addToBinButton
-        );
         
         addToBinButton.onclick = () => {
             const price = priceInput.value;
             if (!price) {
-                alert('Please enter a price');
+                priceInput.classList.add('error');
                 return;
             }
+            priceInput.classList.remove('error');
             gift.price = Math.round(parseFloat(price) * 100);
             const card = giftList.querySelector(`[data-id="${gift.id}"]`);
             if (card) {
