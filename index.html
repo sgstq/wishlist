@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Gift Picker</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="gift-list-panel">
+            <h2>Gift List</h2>
+            <div class="gift-list" id="giftList">
+                <!-- Gift cards will be added here -->
+            </div>
+            <button id="showUploadSection" class="toggle-button">Add Gifts</button>
+            <div class="upload-options" style="display: none;">
+                <div class="upload-section">
+                    <input type="file" id="giftImage" accept="image/*" multiple>
+                    <input type="number" id="giftPrice" placeholder="Price (€)" step="0.01">
+                    <button id="addGift" class="primary-button">Add Gift(s)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bin-panel">
+            <div class="panel-header">
+                <h2>Gift Bin</h2>
+                <div class="bin-status">
+                    <div class="total-price">Total: <span id="totalPrice">€0.00</span></div>
+                    <div class="limit-left">Limit Left: <span id="limitLeft">No limit set</span></div>
+                </div>
+            </div>
+            <div class="bin" id="giftBin">
+                <!-- Selected gifts will be added here -->
+            </div>
+            <button id="showLimitSection" class="toggle-button">Set Price Limit</button>
+            <div class="price-limit-section" style="display: none;">
+                <input type="number" id="priceLimit" placeholder="Price Limit (€)" step="0.01">
+                <button id="setLimit">Set Limit</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="preview-modal" id="previewModal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="previewImage" src="" alt="Gift Preview">
+            <button id="addToBin">Add to Bin</button>
+        </div>
+    </div>
+
+    <script src="scripts/app.js"></script>
+</body>
+</html> 
