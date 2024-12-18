@@ -549,3 +549,70 @@ function validateAndParsePrice(value) {
     // Convert to cents and round to avoid floating point issues
     return Math.round(parsed * 100);
 }
+
+// Function to export gifts
+function exportGifts(gifts) {
+    const dataStr = JSON.stringify(gifts, null, 2); // Convert gifts to JSON
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'gifts.json'; // Name of the exported file
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Function to import gifts
+function importGifts(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedGifts = JSON.parse(e.target.result);
+            
+            // Clear existing gifts
+            gifts = [];
+            binGifts = [];
+            giftList.innerHTML = '';
+            giftBin.innerHTML = '';
+            
+            // Add each imported gift to the appropriate location
+            importedGifts.forEach(gift => {
+                gifts.push(gift);
+                if (gift.location === 'bin') {
+                    binGifts.push(gift);
+                    giftBin.appendChild(createGiftCard(gift));
+                } else {
+                    giftList.appendChild(createGiftCard(gift));
+                }
+            });
+            
+            // Update the bin status
+            updateBinStatus();
+        } catch (error) {
+            console.error('Error importing gifts:', error);
+            alert('Error importing gifts. Please check the file format.');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Function to get all gifts
+function getGifts() {
+    // Return a copy of the gifts array to avoid modifying the original
+    return [...gifts];
+}
+
+// Update the export click handler to include both list and bin gifts
+document.getElementById('exportGifts').addEventListener('click', () => {
+    // Get all gifts with their current locations
+    const giftsToExport = getGifts();
+    exportGifts(giftsToExport);
+});
+
+document.getElementById('importGifts').addEventListener('change', importGifts);

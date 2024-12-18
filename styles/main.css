@@ -487,4 +487,37 @@ input[type="number"].error {
 .limit-left::before {
     font-size: 24px; /* Adjust the size as needed */
 }
+
+/* Add styles for the list actions */
+.list-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Style for the import label to match buttons */
+label.primary-button {
+    display: inline-block;
+    margin: 0;
+    cursor: pointer;
+}
+
+/* Update list header to accommodate the new buttons */
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.list-header h2 {
+    margin-bottom: 0;
+}
+
+.import-export-section {
+    display: flex;
+    gap: 10px;
+    padding: 16px;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+}
   
